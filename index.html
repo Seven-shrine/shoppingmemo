@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>買い出しメモ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <h1 class="main-title">買い出しメモ</h1>
+        <p class="sub-tip">💡 カードをタップするとメニューが開きます</p>
+
+        <div class="category-card" id="vegetables">
+            <div class="category-header header-veg">🥦 野菜（推奨2つ）</div>
+            <div class="icon-grid shopping-list">
+                <div class="icon-slot add-btn" onclick="addCard('vegetables', 'shopping')">+</div>
+            </div>
+            <div class="fridge-container">
+                <div class="fridge-header">🧊 冷蔵庫の中</div>
+                <div class="icon-grid fridge-list"></div>
+            </div>
+        </div>
+
+        <div class="category-card" id="meat">
+            <div class="category-header header-meat">🥩 お肉（推奨2つ）</div>
+            <div class="icon-grid shopping-list">
+                <div class="icon-slot add-btn" onclick="addCard('meat', 'shopping')">+</div>
+            </div>
+            <div class="fridge-container">
+                <div class="fridge-header">🧊 冷蔵庫の中</div>
+                <div class="icon-grid fridge-list"></div>
+            </div>
+        </div>
+
+        <div class="category-card" id="fish">
+            <div class="category-header header-fish">🐟 お魚（推奨1つ）</div>
+            <div class="icon-grid shopping-list">
+                <div class="icon-slot add-btn" onclick="addCard('fish', 'shopping')">+</div>
+            </div>
+            <div class="fridge-container">
+                <div class="fridge-header">🧊 冷蔵庫の中</div>
+                <div class="icon-grid fridge-list"></div>
+            </div>
+        </div>
+
+        <div class="category-card" id="others">
+            <div class="category-header header-others">🍳 その他</div>
+            <div class="icon-grid shopping-list">
+                <div class="icon-slot add-btn" onclick="addCard('others', 'shopping')">+</div>
+            </div>
+            <div class="fridge-container">
+                <div class="fridge-header">🧊 冷蔵庫の中</div>
+                <div class="icon-grid fridge-list"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="input-modal" class="modal">
+        <div class="modal-content">
+            <h3>食材を登録</h3>
+            <input type="text" id="emoji-input" placeholder="🥦 (絵文字を入力)" maxlength="2">
+            <input type="text" id="name-input" placeholder="キャベツ" maxlength="6">
+            <input type="number" id="count-input" placeholder="数量" value="1" min="1" max="99">
+            <div class="modal-btns">
+                <button onclick="closeModal()">キャンセル</button>
+                <button onclick="submitCard()">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="action-title">食材の操作</h3>
+            <div class="count-edit-area">
+                <span>数量：</span>
+                <input type="number" id="edit-count-input" min="1" max="99">
+            </div>
+            <button class="menu-btn move-btn" id="move-btn-text" onclick="executeMove()">冷蔵庫へ移動</button>
+            <button class="menu-btn delete-btn" onclick="executeDelete()">このカードを削除</button>
+            <button class="menu-btn close-btn" onclick="closeActionModal()">閉じる</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
