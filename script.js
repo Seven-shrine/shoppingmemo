@@ -1,6 +1,6 @@
 let currentCategory = '';
 let targetListType = '';
-let selectedIndex = null; // 現在メニューで選択しているカードの番号
+let selectedIndex = null;
 
 const colorMap = {
     vegetables: '#ff9800',
@@ -9,24 +9,19 @@ const colorMap = {
     others: '#8e24aa'
 };
 
-// 全カテゴリのデータ（
+// 💡新設：各カテゴリの「定番絵文字」リスト
+const emojiPaletteMap = {
+    vegetables: ['🥦', '🍅', '🧅', '🥕', '🥬', '🥔', '🍄', '🥑','🧊'],
+    meat: ['🥩', '🍗', '🍖', '🥓', '🍔', '🥟','🧊'],
+    fish: ['🐟','🐙', '🦑', '🦐', '🦪','🧊'],
+    others: ['🥚', '🥛', '🍞', '🧀', '⬜','🧊'] // 文字でもいけます！
+};
+
 let stockData = {
-    vegetables: {
-        shopping: [],
-        fridge: []
-    },
-    meat: {
-        shopping: [],
-        fridge: []
-    },
-    fish: {
-        shopping: [],
-        fridge: []
-    },
-    others: {
-        shopping: [],
-        fridge: []
-    }
+    vegetables: { shopping: [], fridge: [] },
+    meat: { shopping: [], fridge: [] },
+    fish: { shopping: [], fridge: [] },
+    others: { shopping: [], fridge: [] }
 };
 
 window.onload = function() {
@@ -37,6 +32,23 @@ window.onload = function() {
 function addCard(categoryId, listType) {
     currentCategory = categoryId;
     targetListType = listType;
+    
+    // 💡新設：選んだカテゴリに応じた定番絵文字パレットを生成する
+    const paletteContainer = document.getElementById('emoji-palette-container');
+    paletteContainer.innerHTML = ''; // 一度クリア
+    
+    const emojis = emojiPaletteMap[categoryId] || [];
+    emojis.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'palette-btn';
+        btn.innerText = emoji;
+        // タップしたら、自動的に上の絵文字入力欄にその絵文字が入る！
+        btn.onclick = () => {
+            document.getElementById('emoji-input').value = emoji;
+        };
+        paletteContainer.appendChild(btn);
+    });
+
     document.getElementById('input-modal').style.display = 'flex';
 }
 
@@ -61,7 +73,7 @@ function submitCard() {
     }
 }
 
-/* --- カードをタップした時のメニュー操作関数（新設） --- */
+/* --- カード操作メニューポップアップ --- */
 function openActionMenu(categoryId, listType, index) {
     currentCategory = categoryId;
     targetListType = listType;
@@ -69,26 +81,22 @@ function openActionMenu(categoryId, listType, index) {
 
     const item = stockData[categoryId][listType][index];
     
-    // メニューの見出しを設定
     document.getElementById('action-title').innerText = `${item.emoji} ${item.name}`;
-    // 現在の数量をセット
     document.getElementById('edit-count-input').value = item.count;
     
-    // ボタンのテキストを移動先に応じて変える
     const moveBtn = document.getElementById('move-btn-text');
     if (listType === 'shopping') {
         moveBtn.innerText = '🧊 冷蔵庫へ入れる';
-        moveBtn.style.backgroundColor = '#2196f3'; // 青
+        moveBtn.style.backgroundColor = '#2196f3';
     } else {
         moveBtn.innerText = '🛒 買い物リストへ戻す';
-        moveBtn.style.backgroundColor = '#ff9800'; // オレンジ
+        moveBtn.style.backgroundColor = '#ff9800';
     }
 
     document.getElementById('action-modal').style.display = 'flex';
 }
 
 function closeActionModal() {
-    // 閉じる前に、もし数量が変更されていたら保存する
     if (selectedIndex !== null) {
         const newCount = parseInt(document.getElementById('edit-count-input').value) || 1;
         stockData[currentCategory][targetListType][selectedIndex].count = newCount;
@@ -98,9 +106,7 @@ function closeActionModal() {
     renderAll();
 }
 
-// メニューから「移動」を押したとき
 function executeMove() {
-    // 閉じる前に数量の変更を確定させる
     const newCount = parseInt(document.getElementById('edit-count-input').value) || 1;
     stockData[currentCategory][targetListType][selectedIndex].count = newCount;
 
@@ -115,7 +121,6 @@ function executeMove() {
     renderAll();
 }
 
-// メ認から「削除」を押したとき
 function executeDelete() {
     if (confirm('この食材を削除しますか？')) {
         stockData[currentCategory][targetListType].splice(selectedIndex, 1);
@@ -147,22 +152,18 @@ function renderList(catId, listType) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'icon-slot';
         
-        // カードをタップしたらメニューを開く
         cardDiv.onclick = () => openActionMenu(catId, listType, index);
 
-        // コスト badge (数量を表示)
         const costBadge = document.createElement('div');
         costBadge.className = 'cost-badge';
-        costBadge.innerText = item.count; // ここにデータ内の数量を反映！
+        costBadge.innerText = item.count;
         costBadge.style.borderColor = colorMap[catId];
         costBadge.style.color = colorMap[catId];
 
-        // 絵文字
         const emojiDiv = document.createElement('div');
         emojiDiv.className = 'slot-emoji';
         emojiDiv.innerText = item.emoji;
 
-        // 名前
         const nameDiv = document.createElement('div');
         nameDiv.className = 'slot-name';
         nameDiv.innerText = item.name;

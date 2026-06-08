@@ -59,10 +59,14 @@
 
     </div>
 
-    <div id="input-modal" class="modal">
+   <div id="input-modal" class="modal">
         <div class="modal-content">
             <h3>食材を登録</h3>
-            <input type="text" id="emoji-input" placeholder="🥦 (絵文字を入力)" maxlength="2">
+            
+            <div class="emoji-palette" id="emoji-palette-container">
+                </div>
+
+            <input type="text" id="emoji-input" placeholder="🥦 (上のボタンか絵文字を入力)" maxlength="2">
             <input type="text" id="name-input" placeholder="キャベツ" maxlength="6">
             <input type="number" id="count-input" placeholder="数量" value="1" min="1" max="99">
             <div class="modal-btns">
