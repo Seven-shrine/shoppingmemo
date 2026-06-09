@@ -9,12 +9,39 @@ const colorMap = {
     others: '#8e24aa'
 };
 
-// 💡新設：各カテゴリの「定番絵文字」リスト
+// 💡あなたがカスタマイズしたお気に入りのパレット設定！
 const emojiPaletteMap = {
-    vegetables: ['🥦', '🍅', '🧅', '🥕', '🥬', '🥔', '🍄', '🥑','🧊'],
-    meat: ['🥩', '🍗', '🍖', '🥓', '🍔', '🥟','🧊'],
+    vegetables: ['🧅', '🥕', '🥔','🥬','🍄', '🥦','🧊'],
+    meat: ['🐔', '🐷', '🐮', '🥓','🥩','🧊'],
     fish: ['🐟','🐙', '🦑', '🦐', '🦪','🧊'],
-    others: ['🥚', '🥛', '🍞', '🧀', '⬜','🧊'] // 文字でもいけます！
+    others: ['🥚', '🥛', '🍞', '🧀', '⬜','🧊']
+};
+
+// 💡新設：絵文字を押したときに自動で入る「名前」の辞書
+const emojiNameMap = {
+    '🥦': 'ブロッコリー',
+    '🍅': 'トマト',
+    '🧅': '玉ねぎ',
+    '🥕': '人参',
+    '🥬': 'キャベツ',
+    '🥔': 'じゃがいも',
+    '🍄': 'きのこ',
+    '🐮': '牛肉',
+    '🐔': '鶏肉',
+    '🐷': '豚肉',
+    '🥩': '肉',
+    '🥓': 'ベーコン',
+    '🐟': '魚',
+    '🐙': 'たこ',
+    '🦑': 'いか',
+    '🦐': 'えび',
+    '🦪': '貝',
+    '🥚': 'たまご',
+    '🥛': '牛乳',
+    '🍞': 'パン',
+    '🧀': 'チーズ',
+    '⬜': '豆腐',  // ⬜を押したら「豆腐」
+    '🧊': '冷凍'   // 🧊を押したら「冷凍」
 };
 
 let stockData = {
@@ -25,26 +52,43 @@ let stockData = {
 };
 
 window.onload = function() {
+    loadData();
     renderAll();
 };
+
+function saveData() {
+    localStorage.setItem('shoppingMemoData', JSON.stringify(stockData));
+}
+
+function loadData() {
+    const saved = localStorage.getItem('shoppingMemoData');
+    if (saved) {
+        stockData = JSON.parse(saved);
+    }
+}
 
 /* --- 新規追加用の関数 --- */
 function addCard(categoryId, listType) {
     currentCategory = categoryId;
     targetListType = listType;
     
-    // 💡新設：選んだカテゴリに応じた定番絵文字パレットを生成する
     const paletteContainer = document.getElementById('emoji-palette-container');
-    paletteContainer.innerHTML = ''; // 一度クリア
+    paletteContainer.innerHTML = '';
     
     const emojis = emojiPaletteMap[categoryId] || [];
     emojis.forEach(emoji => {
         const btn = document.createElement('button');
         btn.className = 'palette-btn';
         btn.innerText = emoji;
-        // タップしたら、自動的に上の絵文字入力欄にその絵文字が入る！
+        
+        // 💡改良：タップしたら絵文字だけでなく、名前も自動入力する
         btn.onclick = () => {
             document.getElementById('emoji-input').value = emoji;
+            
+            // 辞書から名前を探して、あれば自動で入力欄に入れる
+            if (emojiNameMap[emoji]) {
+                document.getElementById('name-input').value = emojiNameMap[emoji];
+            }
         };
         paletteContainer.appendChild(btn);
     });
@@ -66,6 +110,7 @@ function submitCard() {
 
     if (emoji && name) {
         stockData[currentCategory][targetListType].push({ emoji: emoji, name: name, count: count });
+        saveData();
         renderAll();
         closeModal();
     } else {
@@ -100,6 +145,7 @@ function closeActionModal() {
     if (selectedIndex !== null) {
         const newCount = parseInt(document.getElementById('edit-count-input').value) || 1;
         stockData[currentCategory][targetListType][selectedIndex].count = newCount;
+        saveData();
     }
     document.getElementById('action-modal').style.display = 'none';
     selectedIndex = null;
@@ -116,6 +162,7 @@ function executeMove() {
     const toList = (targetListType === 'shopping') ? 'fridge' : 'shopping';
     stockData[currentCategory][toList].push(item);
 
+    saveData();
     document.getElementById('action-modal').style.display = 'none';
     selectedIndex = null;
     renderAll();
@@ -124,6 +171,7 @@ function executeMove() {
 function executeDelete() {
     if (confirm('この食材を削除しますか？')) {
         stockData[currentCategory][targetListType].splice(selectedIndex, 1);
+        saveData();
         document.getElementById('action-modal').style.display = 'none';
         selectedIndex = null;
         renderAll();
